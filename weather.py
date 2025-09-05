@@ -1,20 +1,23 @@
 import requests
 import json
 while True:
+    #api access
     api_key = "a22baab7f62ce183dab3a1b050ea3bf8"
     base_url = "http://api.openweathermap.org/data/2.5/weather"
 
     cities = ["London", "Paris", "Madrid", "Berlin"]
 
-
+    #loop to get "cities" weather data
     for city in cities:
+        #request url for each city with api key
         request_url = f"{base_url}?q={city}&appid={api_key}&units=metric"
-
+        #http get request in response
         response = requests.get(request_url)
-
+        #shows if request is successful
         if response.status_code == 200:
+            #to parse if its json
             data = response.json()
-
+            #store weather data from dicts and lists in vars
             coordinates = data['coord']
             weather = data['weather'][0]['description']
             temperature = data['main']['temp']
@@ -31,7 +34,7 @@ while True:
             continue
 
 
-
+    #get user specific city
     city_name = input("City name: ")
 
     request_url = f"{base_url}?q={city_name}&appid={api_key}&units=metric"
