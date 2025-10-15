@@ -1,12 +1,17 @@
 import requests
 import json
 import csv
+from dotenv import load_dotenv
+from google import genai
+import os
 
 #create and append csv file with temperature info
 open_csv = open("weather.csv", "a", newline="")
 writer = csv.writer(open_csv)
 #header
 writer.writerow(["CITY", "WEATHER", "TEMPERATURE"])
+
+load_dotenv()
 
 #code for the generic cities
 def generic_city():
@@ -27,12 +32,16 @@ def generic_city():
         country = data['sys']['country']
 
         #output city data called
-        print(f'The city is {city.upper()}, {country}')
-        print(f'The weather is {weather}')
-        print(f'The temperature is {temperature}C')
-        print(f'The humidity is {humidity}')
-        #print(f'These are the coordinates of the city: {coordinates}')
-        #print(data)
+        generic_weather_info = f"""
+        The city is {city.upper()}, {country}
+        The weather is {weather}
+        The temperature is {temperature}C
+        The humidity is {humidity}
+        These are the coordinates of the city: {coordinates}
+        """
+        print(generic_weather_info)
+        global generic_prompt
+        generic_prompt = f"predict the weather of the cities from {generic_weather_info}"
         print("\n")
 
         if response.status_code == 404:
@@ -60,12 +69,16 @@ def user_city():
         country = data['sys']['country']
 
         # output city data called
-        print(f'The city is {city_name.upper()}, {country}')
-        print(f'The weather is {weather}')
-        print(f'The temperature is {temperature}C')
-        print(f'The humidity is {humidity}')
-        #print(f'These are the coordinates of the city: {coordinates}')
-        #print(data)
+        user_weather_info = f"""
+        The city is {city_name.upper()}, {country}
+        The weather is {weather}
+        The temperature is {temperature}C
+        The humidity is {humidity}
+        These are the coordinates of the city: {coordinates}
+        """
+        print(user_weather_info)
+        global user_prompt
+        user_prompt = f"predict the weather of the cities from {user_weather_info}"
         print("\n")
 
         if response.status_code == 404:
@@ -74,10 +87,28 @@ def user_city():
         # adds data to csv file
         writer.writerow([city_name, weather, temperature])
 
+def genericAI():
+    client = genai.Client(api_key = os.getenv("GEMINI_KEY"))
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents= generic_prompt
+    )
+    print(response.text)
+
+def userAI():
+    client = genai.Client(api_key = os.getenv("GEMINI_KEY"))
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents= user_prompt
+    )
+    print(response.text)
+
 
 while True:
     #api access
-    api_key = ""
+    api_key = os.getenv("WEATHER_KEY")
     base_url = "http://api.openweathermap.org/data/2.5/weather"
 
     cities = ["London", "Paris", "Madrid", "Berlin"]
@@ -85,11 +116,13 @@ while True:
     #loop to get "generic cities" weather data
     for city in cities:
         generic_city()
+        genericAI()
 
     #get user "specific cities" weather data
     while True:
         city_name = input("City name: ")
         user_city()
+        userAI()
         #more cities?
         another_city_request = input("another city? Y/N \n> ")
         if another_city_request.lower() == "y":
@@ -97,6 +130,8 @@ while True:
         else:
             print("you exited g")
             break
+
+
     break
 open_csv.close()
 
