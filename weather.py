@@ -2,7 +2,7 @@ import requests
 import json
 import csv
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 import os
 
 #create and append csv file with temperature info
@@ -88,21 +88,25 @@ def user_city():
         writer.writerow([city_name, weather, temperature])
 
 def genericAI():
-    client = genai.Client(api_key = os.getenv("GEMINI_KEY"))
+    global generic_prompt
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents= generic_prompt
-    )
+    genai.configure(api_key=os.getenv("GEMINI_KEY"))
+
+    # Use the correct modern model name
+    model = genai.GenerativeModel("models/gemini-2.5-flash")
+
+    response = model.generate_content(generic_prompt)
     print(response.text)
 
-def userAI():
-    client = genai.Client(api_key = os.getenv("GEMINI_KEY"))
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents= user_prompt
-    )
+def userAI():
+    global user_prompt
+
+    genai.configure(api_key = os.getenv("GEMINI_KEY"))
+
+    model = genai.GenerativeModel("models/gemini-2.5-flash")
+
+    response = model.generate_content(user_prompt)
     print(response.text)
 
 
@@ -134,4 +138,3 @@ while True:
 
     break
 open_csv.close()
-
