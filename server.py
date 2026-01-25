@@ -15,8 +15,8 @@ CORS(app)
 # Constants
 API_KEY = os.getenv("WEATHER_KEY")
 GEMINI_KEY = os.getenv("GEMINI_KEY")
-BASE_URL = "http://api.openweathermap.org/data/2.5/weather"
-FORECAST_URL = "http://api.openweathermap.org/data/2.5/forecast"
+BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
+FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
 def get_ai_prediction(weather_summary):
     if not GEMINI_KEY:
