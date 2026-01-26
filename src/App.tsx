@@ -45,7 +45,7 @@ export default function App() {
     try {
       console.log("📡 Sending request to Python for:", city); 
       
-      const response = await fetch(`https://weather-app-loib.onrender.com=${city}`);
+      const response = await fetch(`https://weather-app-loib.onrender.com/api/weather?city=${city}`);      
       const data = await response.json();
 
       console.log("Data received from Python:", data);
